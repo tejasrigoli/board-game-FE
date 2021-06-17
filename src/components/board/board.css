@@ -1,0 +1,197 @@
+.board {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    background-color:seashell;
+    grid-template-columns: 11vw repeat(9, 8.66vw) 11vw;
+    grid-template-rows: 11vh repeat(9, 8.651vh) 11vh;
+}
+
+  .board div:nth-child(-n + 11) {
+    grid-row: 11;
+  }
+  
+  .board div:nth-child(1) {
+    grid-column: 11;
+  }
+  .board div:nth-child(2){
+    grid-column: 10;
+    /* background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(136, 138, 139)); */
+  }
+  .board div:nth-child(3) {
+    grid-column: 9;
+    /* background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(33, 141, 241)); */
+  }
+  /* .board div:nth-child(-n+11){
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(33, 141, 241));
+  } */
+  .board div:nth-child(4) {
+    grid-column: 8;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(5) {
+    grid-column: 7;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(6) {
+    grid-column: 6;
+    background-image: linear-gradient(to bottom, rgba(34, 34, 34, 0.973), rgb(73, 72, 72));
+  }
+  .board div:nth-child(7) {
+    grid-column: 5;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(8) {
+    grid-column: 4;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(33, 141, 241));
+  }
+  .board div:nth-child(9) {
+    grid-column: 3;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(10) {
+    grid-column: 2;
+    background-image: linear-gradient(to bottom, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(11) {
+    grid-column: 1;
+  }
+  
+  /*left*/
+  .board div:nth-child(12) {
+    grid-row: 10;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(250, 77, 77));
+  }
+  .board div:nth-child(13) {
+    grid-row: 9;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(33, 141, 241));
+  }
+  .board div:nth-child(14) {
+    grid-row: 8;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(250, 77, 77));
+  }
+  .board div:nth-child(15) {
+    grid-row: 7;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(250, 77, 77));
+  }
+  .board div:nth-child(16) {
+    grid-row: 6;
+    background-image: linear-gradient(to left, rgba(34, 34, 34, 0.973), rgb(73, 72, 72));
+  }
+  .board div:nth-child(17) {
+    grid-row: 5;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(18) {
+    grid-row: 4;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(81, 206, 133));
+  }
+  .board div:nth-child(19) {
+    grid-row: 3;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(20) {
+    grid-row: 2;
+    background-image: linear-gradient(to left, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  
+  /*top*/
+  .board div:nth-child(21) {
+    grid-column: 1;
+  }
+  .board div:nth-child(22) {
+    grid-column: 2;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(23) {
+    grid-column: 3;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(33, 141, 241));
+  }
+  .board div:nth-child(24) {
+    grid-column: 4;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(25) {
+    grid-column: 5;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(238, 153, 74));
+  }
+  .board div:nth-child(26) {
+    grid-column: 6;
+    background-image: linear-gradient(to top, rgba(34, 34, 34, 0.973), rgb(73, 72, 72));
+  }
+  .board div:nth-child(27) {
+    grid-column: 7;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(28) {
+    grid-column: 8;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(33, 141, 241));
+  }
+  .board div:nth-child(29) {
+    grid-column: 9;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(30) {
+    grid-column: 10;
+    background-image: linear-gradient(to top, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(31) {
+    grid-column: 11;
+  }
+  
+  /*right*/
+  .board div:nth-child(32) {
+    grid-row: 2;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(250, 77, 77));
+  }
+  .board div:nth-child(33) {
+    grid-row: 3;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(33, 141, 241));
+  }
+  .board div:nth-child(34) {
+    grid-row: 4;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(250, 77, 77));
+  }
+  .board div:nth-child(35) {
+    grid-row: 5;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(250, 77, 77));
+  }
+  .board div:nth-child(36) {
+    grid-row: 6;
+    background-image: linear-gradient(to right, rgba(34, 34, 34, 0.973), rgb(73, 72, 72));
+  }
+  .board div:nth-child(37) {
+    grid-row: 7;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(81, 206, 133));
+  }
+  .board div:nth-child(38) {
+    grid-row: 8;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  .board div:nth-child(39) {
+    grid-row: 9;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(33, 141, 241));
+  }
+  .board div:nth-child(40) {
+    grid-row: 10;
+    background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(136, 138, 139));
+  }
+  
+  .center-square {
+    background-image:  url("../../images/background.jpg");
+    opacity: 0.6;
+    grid-row-start: 2;
+    grid-row-end: 11;
+    grid-column-start: 2;
+    grid-column-end: 11;
+  
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .center-square .center-txt {
+    font-weight: 1000;
+    width: 100%;
+  }
+  
