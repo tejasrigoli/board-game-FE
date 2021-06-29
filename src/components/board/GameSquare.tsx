@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { BoardSection } from "./BoardSection";
 import { SquareConfigData } from "./SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "./SquareType";
 import "./board.css"
+import Player from '../../images/player.svg';
+import styled from 'styled-components';
 
 interface Props {
   id: number;
+  playerPosition: number;
 }
 
-export const GameSquare: React.FC<Props> = ({ id }) => {
+export const GameSquare: React.FC<Props> = ({ id, playerPosition }) => {
 
   const section: BoardSection = SquareConfigData.get(id)?.section!;
   const squareType: SquareType = SquareConfigData.get(id)?.type!;
@@ -39,9 +42,28 @@ export const GameSquare: React.FC<Props> = ({ id }) => {
   return (
     <div className={getSquareClassName()} id={getSquareId()}>
       <div className={getContainerClassName()}>
-        <SquareInfo id={id} />
+      {
+        id==playerPosition &&  <PlayerWrapper>
+        <img className="player" alt="Player" src={Player} />
+        </PlayerWrapper>
+      }
+      <SquareInfo id={id} />
       </div>
     </div>
   );
 
 };
+
+const PlayerWrapper = styled.div`
+  display: flex;
+  position: absolute;
+  font-size: 2em;
+  width: 8%;
+  height: 8%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 1003;
+  transition: all 0.5s ease-out;
+  border-color: black;
+`

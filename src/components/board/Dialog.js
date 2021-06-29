@@ -16,33 +16,6 @@ export default (props) =>{
   const [error, setError] = useState(false);
 
   const handleClose1 = (role) => {
-    // axios.get(`http://localhost:1007/create/gameId/${count}`).then((response)=>{
-    //     console.log("in get res: ",response);
-    //     });
-    // axios.post(`http://localhost:1007/track/dice`,{
-    //   leaderId:"8a4ef716",
-    //   boardId:"1",
-    //   position:"2",
-    //   pointScored:20,
-    //   isDiceRolled:true,
-    //   NumberOnDice:4
-    // }).then((response)=>{
-    //     console.log("in question res: ",response);
-    //     });
-    // axios.post(`http://localhost:1007/question`,{
-    //   teamId:"0",
-    //   teamName:"y",
-    //   boardId:"1",
-    //   position:"2",
-    //   pointsScored:20,
-    //   isDiceRolled:true,
-    //   NumberOnDice:"3",
-    //   result:"4",
-    //   blockColor:"RED",
-    //   questionCounter:1
-    // }).then((response)=>{
-    //     console.log("in question res: ",response);
-    //     });
     if(role == "Leader") 
      {
      axios.get(`http://localhost:1007/track/team/${id}`).then((response)=>{

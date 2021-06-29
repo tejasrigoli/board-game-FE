@@ -4,7 +4,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { Box, Button, FormControl, FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
-import { MATH_QUESTIONS, ANSWER_OPTION_LABELS } from '../constants';
+import { MATH_QUESTIONS, ANSWER_OPTION_LABELS } from '../../constants';
 
 const useStyles = makeStyles({
   root: {

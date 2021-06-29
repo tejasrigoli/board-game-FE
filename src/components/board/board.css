@@ -1,3 +1,8 @@
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .board {
     display: grid;
     justify-content: center;
@@ -176,6 +181,34 @@
     grid-row: 10;
     background-image: linear-gradient(to right, rgba(255,0,0,0), rgb(136, 138, 139));
   }
+
+  .Die {
+    position: absolute;
+    color: white;
+    text-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    align-self: center;
+    justify-self: center;
+    grid-row: 100%;
+    grid-column: 100%;
+    top: 50%;
+    left: 50%;
+    z-index: 1003;
+  }
+  
+  .Die-rolling {
+    animation: spin 1s ease-out;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
   
   .center-square {
     background-image:  url("../../images/background.jpg");
