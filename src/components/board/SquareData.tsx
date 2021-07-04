@@ -12,6 +12,11 @@ const squareGroupColorMap = new Map<number, string>([
   [15, "orange"]
 ]);
 
+const squareGroupColorMapCaps = new Map<number, string>([
+  [1, "GREY"], [2, "ORANGE"], [3, "RED"], [4, "GREY"], [5, "ORANGE"], [6, "GREY"], [7, "RED"], [8, "GREY"],
+  [15, "ORANGE"]
+]);
+
 
 
 const SquareConfigData = new Map<number, SquareConfigData>();
@@ -71,4 +76,4 @@ SquareConfigData.set(38, { type: SquareType.Property, section: BoardSection.Righ
 SquareConfigData.set(39, { type: SquareType.Chance, section: BoardSection.Right });
 SquareConfigData.set(40, { type: SquareType.Property, section: BoardSection.Right, groupId: 8 });
 
-export { SquareConfigData, squareGroupColorMap };
+export { SquareConfigData, squareGroupColorMap, squareGroupColorMapCaps };

@@ -1,18 +1,15 @@
-import React,{useEffect, useState} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import QuestionCard from './QuestionCard';
-import styled from "styled-components";
+import { clearInterval } from 'timers';
 
 const useStyles = makeStyles((theme) => ({
   modal: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    maxWidth: '75%',
-    paddingLeft: '25%',
   },
   paper: {
     backgroundColor: theme.palette.background.paper,
@@ -22,18 +19,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function QuestionModal({ submitAnswer, questionData, questionModalOpen, setQuestionModalOpen, answerData }) {
+export default function TransitionsModal({playerScore}) {
   const classes = useStyles();
+  const [open, setOpen] = React.useState(true);
 
   const handleOpen = () => {
-    setQuestionModalOpen(true);
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setQuestionModalOpen(false);
+    setOpen(true);
   };
-
-
 
   return (
     <div>
@@ -41,20 +37,21 @@ export default function QuestionModal({ submitAnswer, questionData, questionModa
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         className={classes.modal}
-        open={questionModalOpen}
+        open={open}
         onClose={handleClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
-        disableBackdropClick
       >
-        <Fade in={questionModalOpen}>
-          <QuestionCard submitAnswer = {submitAnswer} question = {questionData} setQuestionModalOpen={setQuestionModalOpen} answerData = {answerData} />
+        <Fade in={open}>
+          <center><div className={classes.paper}>
+            <h2 id="transition-modal-title">Game Over</h2>
+            <h3 style ={{color:"green"}} id="transition-modal-description">{`TEAM_1 has WON the Game with ${playerScore} points`}</h3>
+          </div></center>
         </Fade>
       </Modal>
     </div>
   );
 }
-

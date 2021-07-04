@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function QuestionCard({ submitAnswer, question = MATH_QUESTIONS[0], setQuestionModalOpen }) {
+export default function QuestionCard({ submitAnswer, question = MATH_QUESTIONS[0], setQuestionModalOpen, answerData }) {
   const classes = useStyles();
   const [answer, setAnswer] = useState("")
   const [timer, setTimer] = useState(10)
@@ -33,7 +33,7 @@ export default function QuestionCard({ submitAnswer, question = MATH_QUESTIONS[0
     console.log(`${answer} selected`)
     setAnswerSubmitted({ correct: question.rightAnswerOptions[0] === answer, submitted: true })
     submitAnswer(answer,{ correct: question.rightAnswerOptions[0] === answer, submitted: true });
-    //setPlayerScore(question.answer === answer ? playerScore + question.points : playerScore - question.points)
+    //setPlayerScore(question.answer === answer ? playerScore + question.points : playerScore - question.points) // NO need
   }
 
   useEffect(() => {
@@ -73,7 +73,14 @@ export default function QuestionCard({ submitAnswer, question = MATH_QUESTIONS[0
         </Button> : <Button variant="contained" color="secondary" onClick={() => {setQuestionModalOpen(false);submitAnswer(answer,answerSubmitted);}}>
               Close
         </Button>}
-          </Box></> : <Box>{answerSubmitted.correct ? <Box>Great you've answered correctly</Box> : <Box>Sorry you've selected an incorrect answer</Box>}
+          </Box></> : <Box
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justify="center"
+          style={{ maxWidtht: '50px' }}
+          >{answerSubmitted.correct ? <center><b><h2 style ={{color:"green"}}>Great you've answered CORRECTLY</h2></b><br/><h3 fontSize = "30px">{answerData.explanation}</h3></center> : <center><b><h2 style ={{color:"red"}}>Sorry you've selected an INCORRECT OPTION</h2></b><br/><h3 >{answerData.explanation}</h3></center>}
           <Box mt={2} display="flex" justifyContent="center"><Button variant="contained" color="secondary" onClick={() => setQuestionModalOpen(false)}>
             Close
         </Button></Box>

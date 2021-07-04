@@ -6,11 +6,16 @@ import {WORD_NUMS } from '../../constants';
 import QuestionModal from './QuestionModal';
 import styled from "styled-components";
 import Dialog from "./Dialog";
+import RegistrationComponent from "../registration/RegistrationComponent";
+import Header from "../registration/Header";
+import { SquareConfigData, squareGroupColorMapCaps } from "./SquareData";
+import { SquareType } from "./SquareType";
+import GameOver from "./GameOver";
 
 export const TOKEN= "playerDetails";
 
 export default function GameBoard() {
-  const num_squares: Array<number> = Array.from(Array(40));
+  const num_squares = Array.from(Array(40)); //: Array<number>
 
 	const [playerPosition, setPlayerPosition] = useState(0)
 	const [playerScore, setPlayerScore] = useState(0)
@@ -19,12 +24,14 @@ export default function GameBoard() {
 	const [dieRolling, setDieRolling] = useState(false)
 	const [playerRole, setPlayerRole] = useState({})
 	const [gameTrack,setGameTrack] = useState({
-		// yetToStart:true,
-		// question:null,
-		// allPosition:[],
-		// leader:false,
-		// justGameStarted:false
+		yetToStart:true,
+		question:null,
+		allPosition:[],
+		leader:false,
+		justGameStarted:false
 	});
+	const [boardId, setBoardId] = useState(1)
+	const [answerData,setAnswerData] = useState({});
 
 	const [questionModalOpen, setQuestionModalOpen] = useState(false)
 	const [n,setn] = useState(5);
@@ -40,8 +47,8 @@ export default function GameBoard() {
 		const result = Math.floor(Math.random() * (6)) + 1;
 		console.log("FE die result: ",result);
 		axios.post(`http://localhost:1007/track/dice`,{
-		//leaderId:playerRole.id,
-		boardId:"1",
+		leaderId:playerRole.id,
+		boardId:boardId,
 		position:playerPosition + result,
 		pointScored:playerScore,
 		isDiceRolled:true,
@@ -49,17 +56,21 @@ export default function GameBoard() {
 		}).then((response)=>{
         console.log("in dice res: ",response);
 		});
+		const blockColor = squareGroupColorMapCaps.get(SquareConfigData.get(playerPosition +1)?.groupId);
+		console.log("player pos",playerPosition +1);
+		console.log("groupId",SquareConfigData.get(playerPosition +1).groupId);
+		console.log("blockColor",blockColor);
 		  axios.post(`http://localhost:1007/draw/question`,{
-			//teamId:playerRole.id,
-			teamName:"y",
-			boardId:"1",
+			teamId:playerRole.id,
+			teamName:"TEAM_1",
+			boardId:boardId,
 			position:playerPosition + result,
 			pointsScored:playerScore,
 			isDiceRolled:true,
 			NumberOnDice:result,
 			result:"",
-			blockColor:playerPosition + result%2==0 ? "GREY":"RED",
-			questionCounter:Math.floor(Math.random() * (6)) + 1
+			blockColor:blockColor ?? "GREY",
+			questionCounter:""
 		  }).then((response)=>{
 			  console.log("in question res: ",response);
 			  setQuestionData(response.data);
@@ -69,42 +80,51 @@ export default function GameBoard() {
 		setTimeout(() => { setDieRolling(false); setQuestionModalOpen(true) }, 1000)
 	}
 
-	const submitAnswer = (answer: any,answerSubmitted:any) => {
+	const submitAnswer = (answer,answerSubmitted) => {
+		const blockColor = squareGroupColorMapCaps.get(SquareConfigData.get(playerPosition +1)?.groupId);
+		const squareType = SquareConfigData.get(playerPosition +1)?.type;
 		console.log("in sub ans: answer: ",answer," answersub: ",answerSubmitted);
+		
 		axios.post(`http://localhost:1007/validate/answer`,{
-			//teamId:playerRole.id,
-			teamName:"y",
-			boardId:"1",
+			teamId:playerRole.id,
+			teamName:"TEAM_1",
+			boardId:boardId,
 			position:playerPosition,
 			pointsScored:playerScore,
 			diceRolled:true,
 			numberOnDice:roll,
 			result:"",
-			blockColor:playerPosition %2 ==0 ? "GREY":"RED",
+			blockColor:blockColor ?? "GREY",
 			optionSelected : answer,
-			questionAnswered: answerSubmitted.submitted,
-		//	questionKey: questionData.questionKey
+			isQuestionAnswered: answerSubmitted.submitted,
+			questionKey: questionData.questionKey,
+			noNegetiveMarked:  squareType === SquareType.PitStop
 		  }).then((response)=>{
+			  setAnswerData(response.data)
 			  setPlayerScore(response.data.pointsScored)
 			  console.log("in Answer res: ",response);
 			  });
 	}
 
-	const setData = (gameTrack: any) =>{
+	const setData = (gameTrack) =>{
 		setPlayerPosition(parseInt(gameTrack.allPosition[0].positionInBoard)); 
 		setPlayerScore(gameTrack.allPosition[0].gamePoint);
 		setRoll((gameTrack.allPosition[0].numberOnDice) ?? 1);
 	}
 
-	// useEffect(()=>{
-	// 	console.log("gameTrack: ",gameTrack);
-	// 	gameTrack?.allPosition?.length>0 && setData(gameTrack);
-	// 	if(gameTrack.question)
-	// 	{
-	// 		setQuestionData(gameTrack.question);
-	// 		setQuestionModalOpen(true);
-	// 	}
-	// },[gameTrack]);
+	useEffect(()=>{
+		console.log("gameTrack: ",gameTrack);
+		if(gameTrack?.allPosition?.length>0) 
+		{ 
+			setData(gameTrack);
+			setBoardId(parseInt(gameTrack?.allPosition[0].boardName));
+		}
+		if(gameTrack.question)
+		{
+			setQuestionData(gameTrack.question);
+			setQuestionModalOpen(true);
+		}
+	},[gameTrack]);
 
 	
 
@@ -118,12 +138,15 @@ export default function GameBoard() {
 		console.log("local data: ",details);
 		if(details?.role == "Leader")
 		{
-			// setPlayerRole({role:details.role,id:details.id});
 		axios.get(`http://localhost:1007/track/team/${details.id}`).then((response)=>{
 			console.log("in track teamL: ",response);
-		//	if(!response.data.leader) setPlayerRole({role:"Guest",id:-1});
-			setGameTrack(response.data);
-
+			if(response.data.leader) 
+			{
+				setPlayerRole({role:details.role,id:details.id});
+				setGameTrack(response.data);
+			}
+			else
+			setPlayerRole({role:"Guest",id:-1});
 			});
 		}
 		else
@@ -136,22 +159,35 @@ export default function GameBoard() {
 		}
 	},[]);
 
-	// useEffect(()=>{
-	// 	console.log("player role : ",playerRole);
-	// 	const json = JSON.stringify(playerRole);
-  //   localStorage.setItem(TOKEN,json);
-	// },[playerRole]);
+	useEffect(()=>{
+		console.log("player role : ",playerRole);
+		const json = JSON.stringify(playerRole);
+    localStorage.setItem(TOKEN,json);
+	},[playerRole]);
 
 	useEffect(()=>{
-		playerPosition > 32 && setPlayerPosition(playerPosition%36)
-		
+		if(playerPosition > 40){
+		  setPlayerPosition(playerPosition%40);
+			setBoardId(boardId+1);
+		}
+		if(playerPosition % 10 == 0 && playerPosition !=0)
+		setPlayerPosition(playerPosition+1);
 	},[playerPosition]);
   
   return (
     <React.Fragment>
+	{
+		boardId >= 3 ?
+		<GameOver playerScore = {playerScore}/> :
+	<>
+	{(playerRole.role != "Leader" && gameTrack.yetToStart) ?
+	<>
+	<Header />
+	<div className="container d-flex align-items-center flex-column">
+	<RegistrationComponent setRole = {setPlayerRole} /></div></> :
       <div className="board">
         {num_squares.map((n, index) => {
-          const id: number = index + 1;
+          const id = index + 1;
           return (<GameSquare
             id={id}
             key={id}
@@ -162,23 +198,28 @@ export default function GameBoard() {
 			Score: {playerScore}					
 		</ScoreDisplay>
         <RoleDisplay>
-			{/* <RoleText>Role: {playerRole.role}</RoleText> */}
+			<RoleText>Role: {playerRole.role}</RoleText>
 			<RoleChange onClick = {()=> setRoleSelection(true)}>Change Role</RoleChange>
 		</RoleDisplay>
 		{roleSelection && <Dialog setRoleSelection = {setRoleSelection} setRole = {setPlayerRole}/>}
-         <i className={dieClasses} onClick={rollDie}></i>
-         <QuestionModal submitAnswer = {submitAnswer} questionData = {questionData} questionModalOpen={questionModalOpen} setQuestionModalOpen={setQuestionModalOpen} playerScore={playerScore} setPlayerScore={setPlayerScore} />
+         <i className={dieClasses} onClick={playerRole.role == "Leader"  && rollDie}></i>
+        <ModelContent> <QuestionModal submitAnswer = {submitAnswer} questionData = {questionData} questionModalOpen={questionModalOpen} setQuestionModalOpen={setQuestionModalOpen} answerData = {answerData}/>
+		</ModelContent>
         <div className="center-square square">
           <div className="center-txt">
           </div>
         </div>
       </div>
+	}
+	  </>
+	}
     </React.Fragment>
   );
 }
 
-const RoleText = styled.h2`
-
+const RoleText = styled.div`
+font-size: 25px;
+padding-bottom: 5px;
 `
 const RoleChange = styled.a`
 cursor: pointer;
@@ -187,13 +228,14 @@ cursor: pointer;
   }
 `
 const RoleDisplay = styled.div`
-font-size: 20px;
+font-size: 15px;
 position: absolute;
 color: white;
 display: flex;
 flex-direction: column;
+space-between: 0;
 top: 15%;
-left:80%;
+left:78%;
 z-index: 2000;
 `
 const ScoreDisplay = styled.div`
@@ -204,4 +246,8 @@ white-space: nowrap;
 top: 15%;
 left:15%;
 z-index: 2000;
+`
+
+const ModelContent = styled.div`
+left: 50%;
 `

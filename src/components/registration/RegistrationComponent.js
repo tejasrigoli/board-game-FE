@@ -1,41 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import GameBoard from "../board/GameBoard";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import React, {useState} from 'react';
+import axios from "axios";
 
 
-class RegistrationComponent extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            teamcount: "1"
-        }
-        this.inputData = this.inputData.bind(this);
-        this.game = this.game.bind(this);
-    }
-    inputData(e) {
-        //console.log(label);
-        // console.log(e.teamcount);
+const RegistrationComponent = (props) => {
+
+
+        const [teamcount, setTeamcount]  = useState("1");
+        const [teamName, setTeamName]  = useState("Team Name");
+        const [leaderId, setLeaderId]  = useState({});
+        const [mails, setMails]  = useState([]);
+
+    const inputData = (e) => {
         console.log(e.target.value);
-        console.log(this.state.teamcount);
-        // this.setState({ teamcount: e.target.value })
-        this.setState({
-            teamcount: e.target.value
-        });
-        console.log(this.state.teamcount);
-    }
-
-    game() {
-        return (
-            // <React.Fragment>
-            //     <CssBaseline />
-            <GameBoard />
-            // </React.Fragment>
+        console.log(teamcount);
+        setTeamcount(
+            e.target.value,
         );
+        console.log(teamcount);
     }
 
-    render() {
+   const  changeLeaderId = (id) => {
+    setLeaderId({});
+            axios.get(`http://localhost:1007/track/team/${id}`).then((response)=>{
+                console.log("in track teamL: ",response);
+                if(response.data.leader)
+                setLeaderId({role:"Leader",id:id});
+                setTeamName(response.data.nextTurn.teamName)
+                });
+    }
+
+    const onLeaderIdChange = (e) => {
+        e.target.value.length == 8 &&
+        changeLeaderId(e.target.value)
+        setLeaderId({});
+        setTeamName("Team Name");
+    }
+
+    const submit = (e) => {
+        e.preventDefault();
+        props.setRole(leaderId);
+    }
+
+    const mailEnter = (s,i) =>{
+        
+    }
+
         var fieldsArray = [];
-        for (var i = 1; i <= parseInt(this.state.teamcount); i++) {
+        for (var i = 1; i <= parseInt(teamcount); i++) {
             fieldsArray.push(
                 <div>
                     <div class="input-group mb-3">
@@ -46,6 +57,7 @@ class RegistrationComponent extends React.Component {
                             className="form-control"
                             id="email"
                             aria-describedby="emailHelp"
+                            onChange = {(e)=>mailEnter(e.target.value,i)}
                             required
                         />
                     </div>
@@ -64,6 +76,7 @@ class RegistrationComponent extends React.Component {
                                 className="form-control"
                                 id="leaderId"
                                 placeholder="Enter your Team Id"
+                                onChange = {onLeaderIdChange}
                                 required
                             />
                         </div>
@@ -73,14 +86,15 @@ class RegistrationComponent extends React.Component {
                                 className="form-control"
                                 id="teamName"
                                 placeholder="Enter your Team Name"
-                                required
+                                value = {teamName}
+                                disabled
                             />
                         </div>
                         <div class="form-group">
                             <h6>Team Count</h6>
                             <select class="form-control"
-                                defaultValue={this.state.teamcount}
-                                onChange={this.inputData} required>
+                                defaultValue={teamcount}
+                                onChange={inputData} required>
                                 <option value="1" name="teamcount">1</option>
                                 <option value="2" name="teamcount">2</option>
                                 <option value="3" name="teamcount">3</option>
@@ -98,7 +112,8 @@ class RegistrationComponent extends React.Component {
                         </div>
                         <button type="submit"
                             className="btn btn-danger pull-right"
-                            onClick={this.game()}>
+                            disabled = {leaderId.role != "Leader"} //|| mails.length != teamcount}
+                            onClick={submit}>
                             Register
                         </button>
                     </div>
@@ -106,7 +121,6 @@ class RegistrationComponent extends React.Component {
             </div>
 
         );
-    }
 }
 
 export default RegistrationComponent;
