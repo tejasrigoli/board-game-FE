@@ -4,24 +4,25 @@ import { SquareConfigData } from "./SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "./SquareType";
 import "./board.css"
+import PlayerBlue from '../../images/player_blue.svg';
+import PlayerGreen from '../../images/player_green.svg';
+import PlayerRed from '../../images/player_red.svg';
+import PlayerYellow from '../../images/player_yellow.svg';
 import Player from '../../images/player.svg';
 import styled from 'styled-components';
 
-interface Props {
-  id: number;
-  playerPosition: number;
-}
 
-export const GameSquare: React.FC<Props> = ({ id, playerPosition }) => {
 
-  const section: BoardSection = SquareConfigData.get(id)?.section!;
-  const squareType: SquareType = SquareConfigData.get(id)?.type!;
+export const GameSquare = ({ id, allPlayerPositions }) => {
 
-  const sectionMap = new Map<BoardSection, string>([
+  const section = SquareConfigData.get(id)?.section;
+  const squareType = SquareConfigData.get(id)?.type;
+
+  const sectionMap = new Map([
     [BoardSection.Top, "top"], [BoardSection.Right, "right"], [BoardSection.Left, "left"], [BoardSection.Bottom, "bottom"]
   ]);
 
-  const squareTypeClass = new Map<SquareType, string>([
+  const squareTypeClass = new Map([
     [SquareType.Bug, "bug"], [SquareType.Chance, "chance"], [SquareType.Go, "passgo"],
     [SquareType.Turn, "turn"], [SquareType.Property, "property"], [SquareType.PitStop, "pitstop"]
   ]);
@@ -38,14 +39,25 @@ export const GameSquare: React.FC<Props> = ({ id, playerPosition }) => {
     return "game-square-" + id;
   };
 
+  const players = new Map([
+    [0,PlayerBlue],
+    [1,PlayerGreen],
+    [2,PlayerRed],
+    [3,PlayerYellow]
+  ]);
 
   return (
     <div className={getSquareClassName()} id={getSquareId()}>
       <div className={getContainerClassName()}>
       {
-        id==playerPosition &&  <PlayerWrapper>
-        <img className="player" alt="Player" src={Player} />
-        </PlayerWrapper>
+        allPlayerPositions.map((playerPosition, index) =>
+        {
+          console.log("allPlayers ", parseInt(playerPosition.positionInBoard)+1," index ",index);
+           if((parseInt(playerPosition.positionInBoard)+1) == id) return (<PlayerWrapper>
+          <img className="player" alt="Player" src={players.get(index)} />
+          </PlayerWrapper>);
+        }
+        )
       }
       <SquareInfo id={id} />
       </div>
@@ -63,7 +75,7 @@ const PlayerWrapper = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
-  z-index: 1003;
+  z-index: 500;
   transition: all 0.5s ease-out;
   border-color: black;
 `

@@ -8,16 +8,27 @@ import styled from "styled-components";
 import Dialog from "./Dialog";
 import RegistrationComponent from "../registration/RegistrationComponent";
 import Header from "../registration/Header";
-import { SquareConfigData, squareGroupColorMapCaps } from "./SquareData";
+import { SquareConfigData, squareGroupColorMap } from "./SquareData";
 import { SquareType } from "./SquareType";
 import GameOver from "./GameOver";
+import LoadingPage from "../LoadingPage";
+import Snackbar from "./Snackbar";
+import {getPlayerId, getPlayerPosition} from "../utils/PlayerInfo";
+import Button from '@material-ui/core/Button';
 
 export const TOKEN= "playerDetails";
 
 export default function GameBoard() {
-  const num_squares = Array.from(Array(40)); //: Array<number>
+  const num_squares = Array.from(Array(40));
 
-	const [playerPosition, setPlayerPosition] = useState(0)
+	const [loading, setLoading] =  useState(false);
+
+	const [allPlayerPositions, setAllPlayerPositions] = useState([
+		{
+			teamName: "TEAM_1",
+			positionInBoard : 0
+		}
+	]);
 	const [playerScore, setPlayerScore] = useState(0)
 
 	const [roll, setRoll] = useState(1)
@@ -37,35 +48,48 @@ export default function GameBoard() {
 	const [n,setn] = useState(5);
 	const [roleSelection,setRoleSelection] = useState(false);
 	const [questionData, setQuestionData] = useState({});
+	const [currLeaderId, setCurrentLeaderId] = useState("");
+	const [currPlayer, setCurrPlayer] = useState({
+		boardName: 1,
+		diceRolled: true,
+		gamePoint: 0,
+		numberOnDice: 1,
+		positionInBoard: 0,
+		teamName: "TEAM_1"
+	})
+	const [showSnackbar,setShowSnackbar] = useState(false);
 
   let dieClasses = `Die fas fa-dice-${WORD_NUMS[roll - 1]} fa-5x`;
 	if (dieRolling) dieClasses += ' Die-rolling';
 
   
-	const rollDie = () => {
+	 const rollDie = () => {
+		//const playerPosition = (currPlayer?.positionInBoard ?? 0) + result;//currPlayer?.teamName ? getPlayerPosition(currPlayer.teamName, allPlayerPositions) : 0;
 		setDieRolling(true)
 		const result = Math.floor(Math.random() * (6)) + 1;
 		console.log("FE die result: ",result);
+		const playerPosition = parseInt(currPlayer?.positionInBoard ?? 0) + result;
 		axios.post(`http://localhost:1007/track/dice`,{
-		leaderId:playerRole.id,
+		leaderId:gameTrack?.nextTurn?.leaderId,
 		boardId:boardId,
-		position:playerPosition + result,
+		position:getPlayerPositionInBoard(playerPosition),
 		pointScored:playerScore,
 		isDiceRolled:true,
 		NumberOnDice:result
 		}).then((response)=>{
         console.log("in dice res: ",response);
 		});
-		const blockColor = squareGroupColorMapCaps.get(SquareConfigData.get(playerPosition +1)?.groupId);
-		console.log("player pos",playerPosition +1);
-		console.log("groupId",SquareConfigData.get(playerPosition +1).groupId);
-		console.log("blockColor",blockColor);
+		const blockColor = squareGroupColorMap.get(SquareConfigData.get(playerPosition +1)?.groupId);
+		// console.log("player pos",playerPosition +1);
+		// console.log("groupId",SquareConfigData.get(playerPosition +1).groupId);
+		// console.log("blockColor",blockColor);
+		// console.log("currLeaderId ", currLeaderId);
 		  axios.post(`http://localhost:1007/draw/question`,{
-			teamId:playerRole.id,
-			teamName:"TEAM_1",
-			boardId:boardId,
-			position:playerPosition + result,
-			pointsScored:playerScore,
+			teamId:gameTrack?.nextTurn?.leaderId,
+			teamName:gameTrack?.nextTurn?.teamName,
+			boardId:currPlayer?.boardName ?? 1,
+			position:getPlayerPositionInBoard(playerPosition),
+			pointsScored:currPlayer?.gamePoint ?? 0,
 			isDiceRolled:true,
 			NumberOnDice:result,
 			result:"",
@@ -75,22 +99,23 @@ export default function GameBoard() {
 			  console.log("in question res: ",response);
 			  setQuestionData(response.data);
 			  });
-		setRoll(result)
-		setPlayerPosition(playerPosition + result)
-		setTimeout(() => { setDieRolling(false); setQuestionModalOpen(true) }, 1000)
+		setRoll(result);
+		//setPlayerPosition((currPlayer?.positionInBoard ?? 0) + result);
+		setTimeout(() => { setDieRolling(false); setQuestionModalOpen(true) }, 1000);
 	}
 
 	const submitAnswer = (answer,answerSubmitted) => {
-		const blockColor = squareGroupColorMapCaps.get(SquareConfigData.get(playerPosition +1)?.groupId);
+		//const playerPosition =currPlayer?.teamName ? getPlayerPosition(currPlayer.teamName, allPlayerPositions) : 0; 
+		const playerPosition = parseInt(currPlayer?.positionInBoard ?? 0) + roll;
+		const blockColor = squareGroupColorMap.get(SquareConfigData.get(playerPosition +1)?.groupId);
 		const squareType = SquareConfigData.get(playerPosition +1)?.type;
 		console.log("in sub ans: answer: ",answer," answersub: ",answerSubmitted);
-		
 		axios.post(`http://localhost:1007/validate/answer`,{
-			teamId:playerRole.id,
-			teamName:"TEAM_1",
-			boardId:boardId,
-			position:playerPosition,
-			pointsScored:playerScore,
+			teamId:gameTrack?.nextTurn?.leaderId,
+			teamName:gameTrack?.nextTurn?.teamName,
+			boardId:currPlayer?.boardName ?? 1,
+			position:getPlayerPositionInBoard(playerPosition),
+			pointsScored:currPlayer?.gamePoint ?? 0,
 			diceRolled:true,
 			numberOnDice:roll,
 			result:"",
@@ -107,9 +132,14 @@ export default function GameBoard() {
 	}
 
 	const setData = (gameTrack) =>{
-		setPlayerPosition(parseInt(gameTrack.allPosition[0].positionInBoard)); 
+
+		setAllPlayerPositions(gameTrack?.allPosition);
+		setCurrPlayer(gameTrack.allPosition[getPlayerId(gameTrack?.nextTurn?.teamName, gameTrack?.allPosition)]);
+		console.log("in set data getId ",getPlayerId("TEAM_1", gameTrack?.allPosition)," param ", gameTrack?.allPosition);
 		setPlayerScore(gameTrack.allPosition[0].gamePoint);
 		setRoll((gameTrack.allPosition[0].numberOnDice) ?? 1);
+		console.log("in set data",currPlayer);
+		setCurrentLeaderId(gameTrack?.nextTurn?.leaderId);
 	}
 
 	useEffect(()=>{
@@ -157,7 +187,32 @@ export default function GameBoard() {
 			setGameTrack(response.data);
 			});
 		}
+
+		setCurrentLeaderId(playerRole.id);
+		console.log("before refresh ",playerRole.id);
+        onRefresh();
 	},[]);
+
+	const onRefresh = ()=> {
+		axios.get(`http://localhost:1007/track/team/refresh`).then((response)=>{
+			console.log("in track teamL new : ",response);
+				setGameTrack(response.data);
+			});
+
+			console.log("show", showSnackbar);
+
+			const timeout = 5000;
+			setShowSnackbar(true);
+			const timer = setTimeout(() => {
+				setShowSnackbar(false);
+				console.log("show", showSnackbar);
+			},timeout);
+			return () => {
+				clearTimeout(timer);
+			}
+			console.log("show", showSnackbar);
+	}
+	
 
 	useEffect(()=>{
 		console.log("player role : ",playerRole);
@@ -165,16 +220,27 @@ export default function GameBoard() {
     localStorage.setItem(TOKEN,json);
 	},[playerRole]);
 
-	useEffect(()=>{
+
+	useEffect(() => {
+		!questionModalOpen && onRefresh();
+	  }, [questionModalOpen])
+
+	const getPlayerPositionInBoard = (playerPosition) => {
+
+		var newPosition = playerPosition;
+
 		if(playerPosition > 40){
-		  setPlayerPosition(playerPosition%40);
+		  newPosition = newPosition % 40;
 			setBoardId(boardId+1);
 		}
-		if(playerPosition % 10 == 0 && playerPosition !=0)
-		setPlayerPosition(playerPosition+1);
-	},[playerPosition]);
+		if(newPosition % 10 == 0 && newPosition !=0)
+		newPosition = newPosition+1;
+
+		return newPosition ? newPosition : 0 ;
+	}
   
   return (
+	  loading ? <LoadingPage /> :
     <React.Fragment>
 	{
 		boardId >= 3 ?
@@ -191,11 +257,15 @@ export default function GameBoard() {
           return (<GameSquare
             id={id}
             key={id}
-            playerPosition = {playerPosition+1}
+            allPlayerPositions = {allPlayerPositions}
           />)
         })}
+		{showSnackbar && <Snackbar teamName = {gameTrack?.nextTurn?.teamName}/>}
+
 		<ScoreDisplay>
-			Score: {playerScore}					
+		{
+			allPlayerPositions.map((playerPosition) => (<><p>{playerPosition?.teamName + " Score: " + playerPosition?.gamePoint}</p><br /></>))
+		}					
 		</ScoreDisplay>
         <RoleDisplay>
 			<RoleText>Role: {playerRole.role}</RoleText>
@@ -240,7 +310,7 @@ z-index: 2000;
 `
 const ScoreDisplay = styled.div`
 position: absolute;
-font-size: xx-large;
+font-size: x-large;
 color:  white;
 white-space: nowrap;
 top: 15%;
@@ -251,3 +321,7 @@ z-index: 2000;
 const ModelContent = styled.div`
 left: 50%;
 `
+
+// <Button variant="contained" color="secondary" onClick = {() => onRefresh()} style={{ position:"absolute", top: "83%", left:"15%", zIndex:"20"}}>
+// 	Refresh
+// </Button>

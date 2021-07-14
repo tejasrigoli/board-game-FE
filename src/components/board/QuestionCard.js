@@ -31,9 +31,8 @@ export default function QuestionCard({ submitAnswer, question = MATH_QUESTIONS[0
   const handleChange = e => setAnswer(e.target.value);
   const handleAnswerSubmitted = () => {
     console.log(`${answer} selected`)
-    setAnswerSubmitted({ correct: question.rightAnswerOptions[0] === answer, submitted: true })
-    submitAnswer(answer,{ correct: question.rightAnswerOptions[0] === answer, submitted: true });
-    //setPlayerScore(question.answer === answer ? playerScore + question.points : playerScore - question.points) // NO need
+    setAnswerSubmitted({ correct: answerData.answerCorrect, submitted: true })
+    submitAnswer(answer,{ correct:answerData.answerCorrect, submitted: true });
   }
 
   useEffect(() => {

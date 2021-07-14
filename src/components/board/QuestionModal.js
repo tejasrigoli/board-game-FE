@@ -34,7 +34,6 @@ export default function QuestionModal({ submitAnswer, questionData, questionModa
   };
 
 
-
   return (
     <div>
       <Modal
